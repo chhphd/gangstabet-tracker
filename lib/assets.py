@@ -52,7 +52,7 @@ class Wallet:
         self.addresses = self.get_addresses()     
 
     def get_addresses(self) -> list:
-        with open("lib\\addresses.json") as json_data:
+        with open("lib\\addresses_main.json") as json_data:
             address_list = json.load(json_data)
         return address_list
     
