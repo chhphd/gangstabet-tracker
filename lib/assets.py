@@ -13,6 +13,7 @@ class Blockchain:
     gangstabetToken = "cx6139a27c15f1653471ffba0b4b88dc15de7e3267"
     goldenKey = "cx5f1cc357f2304fb2646e20211adbe137ab5852dd"
     crownToken = "cx28b2ec885b50c8a93da752f2d0467a67127a70e8"
+    emeraldCityLand = "cx1125cae5b048ba57c9331e47e0220a3b91287ffb"
 
     def __init__(self):
         self.blockHeight = self.returnBlock()["height"]

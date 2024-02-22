@@ -1,4 +1,4 @@
-from lib.functions import output_rankings, output_singular_nft_list, output_total_holdings
+from lib.functions import output_rankings, output_singular_gangsta_list, output_total_holdings, output_singular_land_list
 from lib.assets import wallet
 from datetime import datetime
 
@@ -43,14 +43,17 @@ def export_to_txt(text, filename):
     else:
         print("Please input 'y' or 'n'.")    
 
+# Main menu
 def menu():
     print("# Gangstabet helper #")
     print("--------------------")
     print("1. Rankings")
     print("2. Total holdings")
     print("3. NFT list for an address")
+    print("4. Land list for an address")
     print("0. Exit")
 
+# Main menu options
 def option1():
     amounts = output_total_holdings(wallet.addresses)
     text = output_rankings(amounts)
@@ -63,9 +66,14 @@ def option2():
     export_to_csv(data, f"output/total_holdings_{formatted_now}.csv")
 
 def option3():
-    data = output_singular_nft_list()
+    data = output_singular_gangsta_list()
     print(data)
     export_to_csv(data, f"output/singular_nftlist_{formatted_now}.csv")
+
+def option4():
+    data = output_singular_land_list()
+    print(data)
+    export_to_csv(data, f"output/singular_landlist_{formatted_now}.csv")
 
 def main():
     while True:
@@ -76,7 +84,9 @@ def main():
         elif choice == "2":
             option2()
         elif choice == "3":
-            option3()    
+            option3()
+        elif choice == "4":
+            option4()    
         elif choice == "0":
             print("Exiting...")
             break
