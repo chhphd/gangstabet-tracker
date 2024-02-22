@@ -95,8 +95,6 @@ def main():
 
 # Get the current date and time
 now = datetime.now()
-
-# Format the date and time
 formatted_now = now.strftime("%Y%m%d_%H%M%S")
 
 if __name__ == "__main__":
