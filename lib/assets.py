@@ -48,6 +48,7 @@ class Blockchain:
         return result
 
 class Wallet:
+
   
     def __init__(self):
         self.addresses = self.get_addresses()     
@@ -62,8 +63,11 @@ class Wallet:
         Prompts the user to input the last 3 characters of an address and returns the one found
 
         Returns:
-            list of str: A list with one address
+            Alist with one address. 
+            !!! Remember to call search_address()[0]
         """
+        
+        # Input and loop
         while True:
             suffix = input("Input the last 3 characters of the address: ")
             matched_items = [item for item in self.addresses if item.endswith(suffix)]
@@ -71,8 +75,9 @@ class Wallet:
             if matched_items:
                 return matched_items
             else:
-                print(f"No addresses ending in {suffix}. Please try again")
+                print(f"No addresses ending in {suffix}. Please try again")  
 
-# Init
-blockchain = Blockchain()
-wallet = Wallet()                        
+
+# wallet = Wallet()
+# print(type(wallet.get_addresses()))
+# print(type(wallet.search_address()[0]))                               

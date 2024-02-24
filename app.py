@@ -1,5 +1,4 @@
 from lib.functions import output_rankings, output_singular_gangsta_list, output_total_holdings, output_singular_land_list
-from lib.assets import wallet
 from datetime import datetime
 
 def export_to_csv(df, filename):
@@ -45,6 +44,7 @@ def export_to_txt(text, filename):
 
 # Main menu
 def menu():
+    print("--------------------")
     print("# Gangstabet helper #")
     print("--------------------")
     print("1. Rankings")
@@ -55,13 +55,15 @@ def menu():
 
 # Main menu options
 def option1():
-    amounts = output_total_holdings(wallet.addresses)
+    # TODO: progress bar
+    amounts = output_total_holdings()
     text = output_rankings(amounts)
     print(text)
     export_to_txt(text, f"output/rankings_{formatted_now}.txt")
 
 def option2():
-    data = output_total_holdings(wallet.addresses)
+    # TODO: progress bar
+    data = output_total_holdings()
     print(data)
     export_to_csv(data, f"output/total_holdings_{formatted_now}.csv")
 
