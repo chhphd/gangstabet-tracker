@@ -1,18 +1,55 @@
+from iconsdk.icon_service import IconService
+from iconsdk.providers.http_provider import HTTPProvider
+from iconsdk.builder.call_builder import CallBuilder
 import pandas as pd
-from lib.assets import Wallet, Blockchain
 
-# Init blockchain
-def init_blockchain():
-    blockchain = Blockchain()
-    return blockchain
+# Blockchain class
+class Blockchain:
+    # Icon service
+    icon_service = IconService(HTTPProvider("https://ctz.solidwallet.io", 3))
 
-# Init wallet list
-def init_wallets():
-    wallets = Wallet()
-    return wallets
+    # Contracts
+    gangstabetMainContract = "cx384018e03aa8b739472c7a0645b70df97550e2c2"
+    gangstabetToken = "cx6139a27c15f1653471ffba0b4b88dc15de7e3267"
+    goldenKey = "cx5f1cc357f2304fb2646e20211adbe137ab5852dd"
+    crownToken = "cx28b2ec885b50c8a93da752f2d0467a67127a70e8"
+    emeraldCityLand = "cx1125cae5b048ba57c9331e47e0220a3b91287ffb"
 
-# Contract queries          
+    def __init__(self):
+        self.blockHeight = self.returnBlock()["height"]
+ 
+    def returnBlock(self) -> dict:
+        """
+        Returns the latest block in full format.
+        """
+        block = self.icon_service.get_block("latest")
+        return block
+
+    def call(self, to: str,method: str, params: dict, height: int) -> dict:
+        """
+        Submits a read-only request to query data from the ICON blockchain using the CallBuilder function.
+
+        Args:
+            to: The contract address to query.
+            method: The contract method to query.
+            params: The parameters expected by the contract method.
+            height: The block height to query (useful for fetching data about past state).
+
+        Returns:
+            A dictionary containing the result of the query.
+        """
+        call = CallBuilder().to(to)\
+                            .method(method)\
+                            .params(params)\
+                            .height(height)\
+                            .build()
+        
+        result = self.icon_service.call(call)
+        return result
+
+          
 # Gangsta
+
 def gangsta_getCharacterInfo(nftId: int) -> dict:
     """
     Query for one nft. 
@@ -37,7 +74,7 @@ def gangsta_getCharacterInfo(nftId: int) -> dict:
     
     return balance
 
-def gangsta_getAllNftOwned(input_address=None) -> list:
+def gangsta_getAllNftOwned(input_address) -> list:
     """
     Query for one address.
     Contract name: GangstaBet.
@@ -54,19 +91,12 @@ def gangsta_getAllNftOwned(input_address=None) -> list:
 
     # Init class
     blockchain = init_blockchain()
-    wallet = init_wallets()
-
-    # Search address if there's no input param
-    if input_address is not None:
-        address = input_address
-    else:
-        address = wallet.search_address()[0]
 
     # Call the contract
     balance = blockchain.call(
         to=blockchain.gangstabetMainContract, 
         method="getAllNftOwned", 
-        params={"address": address, "page": page}, 
+        params={"address": input_address, "page": page}, 
         height=blockchain.blockHeight)
     
     # Append the first page to the list
@@ -78,7 +108,7 @@ def gangsta_getAllNftOwned(input_address=None) -> list:
         balance = blockchain.call(
             to=blockchain.gangstabetMainContract, 
             method="getAllNftOwned", 
-            params={"address": address, "page": page}, 
+            params={"address": input_address, "page": page}, 
             height=blockchain.blockHeight)
         nftList.append(balance["nftList"])
 
@@ -88,7 +118,7 @@ def gangsta_getAllNftOwned(input_address=None) -> list:
     return flatList
 
 # GBET
-def gbet_balanceOf(input_address=None) -> int:
+def gbet_balanceOf(input_address) -> int:
     """
     Query for one address.
     Contract name: GangstaBet Token.
@@ -102,19 +132,12 @@ def gbet_balanceOf(input_address=None) -> int:
 
     # Init class
     blockchain = init_blockchain()
-    wallet = init_wallets()
-
-    # Search address if there's no input param
-    if input_address is not None:
-        address = input_address
-    else:
-        address = wallet.search_address()[0]
 
     # Call the contract
     balance = blockchain.call(
         to=blockchain.gangstabetToken, 
         method="balanceOf", 
-        params={"_owner": address}, 
+        params={"_owner": input_address}, 
         height=blockchain.blockHeight)
     
     amount = int(balance, 16) * 1e-18
@@ -143,7 +166,7 @@ def gbet_totalSupply() -> int:
     return round(amount, 2)    
 
 # Golden Key
-def goldenkey_balanceOf(input_address=None) -> int:
+def goldenkey_balanceOf(input_address) -> int:
     """
     Query for one address.
     Contract name: GangstaBet Golden Key.
@@ -157,19 +180,12 @@ def goldenkey_balanceOf(input_address=None) -> int:
 
     # Init class
     blockchain = init_blockchain()
-    wallet = init_wallets()
-
-    # Search address if there's no input param
-    if input_address is not None:
-        address = input_address
-    else:
-        address = wallet.search_address()
 
     # Call the contract
     balance = blockchain.call(
         to=blockchain.goldenKey, 
         method="balanceOf", 
-        params={"_owner": address, "_id": 1}, 
+        params={"_owner": input_address, "_id": 1}, 
         height=blockchain.blockHeight)
     
     amount = int(balance, 16)
@@ -198,7 +214,7 @@ def goldenkey_totalSupply() -> int:
     return amount 
 
 # CROWN
-def crown_balanceOf(input_address=None) -> int:
+def crown_balanceOf(input_address) -> int:
     """
     Query for one address.
     Contract name: CROWN.
@@ -212,19 +228,12 @@ def crown_balanceOf(input_address=None) -> int:
 
     # Init class
     blockchain = init_blockchain()
-    wallet = init_wallets()
-
-    # Search address if there's no input param
-    if input_address is not None:
-        address = input_address
-    else:
-        address = wallet.search_address()[0]
 
     # Call the contract
     balance = blockchain.call(
         to=blockchain.crownToken, 
         method="balanceOf", 
-        params={"_owner": address}, 
+        params={"_owner": input_address}, 
         height=blockchain.blockHeight)
     
     amount = int(balance, 16) * 1e-18
@@ -277,7 +286,7 @@ def land_getLandInfo(nftId: int) -> dict:
     
     return balance
 
-def land_getOwnersNfts(input_address=None) -> list:
+def land_getOwnersNfts(input_address) -> list:
     """
     Query for one address.
     Contract name: Emerald City Land.
@@ -293,19 +302,12 @@ def land_getOwnersNfts(input_address=None) -> list:
 
     # Init class
     blockchain = init_blockchain()
-    wallet = init_wallets()
-
-    # Search address if there's no input param
-    if input_address is not None:
-        address = input_address
-    else:
-        address = wallet.search_address()[0]
 
     # Call the contract
     balance = blockchain.call(
         to=blockchain.emeraldCityLand, 
         method="getOwnersNfts", 
-        params={"address": address, "page": page}, 
+        params={"address": input_address, "page": page}, 
         height=blockchain.blockHeight)
     
     # Append the first page to the list
@@ -317,7 +319,7 @@ def land_getOwnersNfts(input_address=None) -> list:
         balance = blockchain.call(
             to=blockchain.emeraldCityLand, 
             method="getOwnersNfts", 
-            params={"address": address, "page": page}, 
+            params={"address": input_address, "page": page}, 
             height=blockchain.blockHeight)
         nftList.append(balance["nftList"])
 
@@ -328,7 +330,7 @@ def land_getOwnersNfts(input_address=None) -> list:
 
 # Output functions
 # Total holdings by address in a table
-def output_total_holdings() -> pd.DataFrame:
+def output_total_holdings(input_address) -> pd.DataFrame:
     """
     Query to see how many nfts are in a wallet.
 
@@ -339,9 +341,6 @@ def output_total_holdings() -> pd.DataFrame:
         A pandas dataframe with multiple columns
     """
     
-    # Init class
-    wallet = init_wallets()
-
     # Init empty lists 
     nft_amounts = []
     gbet_amounts = []
@@ -349,28 +348,23 @@ def output_total_holdings() -> pd.DataFrame:
     crown_amounts = []
     land_amounts = []
 
-    # Get addresses
-    addresses = wallet.get_addresses()
+    # Query the blockchain for data
+    nft_amount = len(gangsta_getAllNftOwned(input_address))
+    gbet_amount = gbet_balanceOf(input_address)
+    goldenkey_amount = goldenkey_balanceOf(input_address)
+    crown_amount = crown_balanceOf(input_address)
+    land_amount = len(land_getOwnersNfts(input_address))
 
-    for address in addresses:
-
-        # Query the blockchain for data
-        nft_amount = len(gangsta_getAllNftOwned(address))
-        gbet_amount = gbet_balanceOf(address)
-        goldenkey_amount = goldenkey_balanceOf(address)
-        crown_amount = crown_balanceOf(address)
-        land_amount = len(land_getOwnersNfts(address))
-
-        # Append to corresponding lists
-        nft_amounts.append(nft_amount) 
-        gbet_amounts.append(gbet_amount)
-        goldenkey_amounts.append(goldenkey_amount)
-        crown_amounts.append(crown_amount)
-        land_amounts.append(land_amount)
+    # Append to corresponding lists
+    nft_amounts.append(nft_amount) 
+    gbet_amounts.append(gbet_amount)
+    goldenkey_amounts.append(goldenkey_amount)
+    crown_amounts.append(crown_amount)
+    land_amounts.append(land_amount)
 
     # Create dataframe
     data = {
-        "address": addresses,
+        # "address": addresses,
         "nft": nft_amounts,
         "gbet": gbet_amounts,
         "goldenkey": goldenkey_amounts,
@@ -382,7 +376,7 @@ def output_total_holdings() -> pd.DataFrame:
     return df    
 
 # Rankings by showing % of supply owned.
-def output_rankings(amounts: pd.DataFrame) -> str:
+def output_rankings(amounts: pd.DataFrame, input_address: str) -> str:
     """
     Query to show % of holdings compared to total supply.
     Can be used separately or inside the output_total_holdings functions
@@ -407,18 +401,17 @@ def output_rankings(amounts: pd.DataFrame) -> str:
     crown_supply = crown_totalSupply()
 
     # Create message
-    text = f"""
-    Your rankings (holdings / supply)
+    text = f"""Hey, {input_address} !
+    Your rankings are (your holdings / total supply):
     NFT: {nft_holdings} / {nft_supply} -> {nft_holdings/nft_supply*100:,.2f} %
     GBET: {gbet_holdings} / {gbet_supply} -> {gbet_holdings/gbet_supply*100:,.2f} %
     Golden Key: {goldenkey_holdings} / {goldenkey_supply} -> {goldenkey_holdings/goldenkey_supply*100:,.2f} %
-    CROWN: {crown_holdings} / {crown_supply} -> {crown_holdings/crown_supply*100:,.2f} %
-    """
+    CROWN: {crown_holdings} / {crown_supply} -> {crown_holdings/crown_supply*100:,.2f} %"""
 
     return text
 
 # NFT list and traits for a single address, searched by the last 3 characters
-def output_singular_gangsta_list() -> pd.DataFrame:
+def output_singular_gangsta_list(input_address) -> pd.DataFrame:
     """
     Queries the chain for NFTs in a wallet and traits for each NFT.
     The function inside prompts the user for the last 3 digits of the address to query so there's no need for args.
@@ -430,9 +423,6 @@ def output_singular_gangsta_list() -> pd.DataFrame:
         A dataframe containing the NFT list, their respective traits and link to craft.network
     """
 
-    # Init class
-    wallet = init_wallets()
-
     # Init empty lists for character attributes
     characterLevel_list = []
     characterName_list = []
@@ -443,8 +433,7 @@ def output_singular_gangsta_list() -> pd.DataFrame:
     levelTitle_list = []
 
     # Query the contract and extract the NFT list for the wallet
-    address = str(wallet.search_address()[0])
-    nft_list = gangsta_getAllNftOwned(address)
+    nft_list = gangsta_getAllNftOwned(input_address)
 
     # Loop through every NFT in the NFT list and query the contract for stats
     for nft in nft_list:
@@ -473,7 +462,6 @@ def output_singular_gangsta_list() -> pd.DataFrame:
 
     # Compile the data into a dict for dataframe
     data = {
-        "address": address,
         "nft_id": nft_list,
         "characterLevel": characterLevel_list,
         "characterName": characterName_list,
@@ -489,7 +477,7 @@ def output_singular_gangsta_list() -> pd.DataFrame:
 
     return df
 
-def output_singular_land_list() -> pd.DataFrame:
+def output_singular_land_list(input_address) -> pd.DataFrame:
     """
     Queries the chain for NFTs in a wallet and traits for each NFT.
     The function inside prompts the user for the last 3 digits of the address to query so there's no need for args.
@@ -501,9 +489,6 @@ def output_singular_land_list() -> pd.DataFrame:
         A dataframe containing the NFT list, their respective traits and link to craft.network
     """
 
-    # Init class
-    wallet = init_wallets()
-
     # Init empty lists for character attributes
     id_list = []
     name_list = []
@@ -513,8 +498,7 @@ def output_singular_land_list() -> pd.DataFrame:
     zone_name_list = []
 
     # Query the contract and extract the NFT list for the wallet
-    address = str(wallet.search_address()[0])
-    nft_list = land_getOwnersNfts(address)
+    nft_list = land_getOwnersNfts(input_address)
 
     # Loop through every NFT in the NFT list and query the contract for stats
     for nft in nft_list:
@@ -581,3 +565,8 @@ def get_zone(key: str) -> str:
     
     return zone_lookup.get(key)
 
+
+# Init blockchain
+def init_blockchain():
+    blockchain = Blockchain()
+    return blockchain
