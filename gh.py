@@ -1,6 +1,11 @@
 from functions import output_rankings, output_singular_gangsta_list, output_total_holdings, output_singular_land_list
 from datetime import datetime
 import argparse
+import re
+
+def validate_string(input_string):
+    regex_pattern = r'^hx[a-fA-F0-9]{40}$'
+    return re.match(regex_pattern, input_string) is not None
 
 def export_to_csv(df, filename):
     """
@@ -125,4 +130,9 @@ formatted_now = now.strftime("%Y%m%d_%H%M%S")
 
 if __name__ == "__main__":
     input_address = parser()
-    main()
+    if validate_string(input_address):
+        main()
+    else:
+        print("Please provide a valid ICX address")
+        exit()
+    
