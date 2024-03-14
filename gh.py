@@ -3,7 +3,20 @@ from datetime import datetime
 import argparse
 import re
 
-def validate_string(input_string):
+def validate_string(input_string: str) -> bool:
+    """
+    Validates the ICX address. Rules:
+    - string starts with 'hx'
+    - string consists of 42 characters
+    - string contains only a-f, A-F, 0-9 after 'hx'
+
+    Args:
+        input_string: str
+
+    Returns:
+    True or False    
+    """
+
     regex_pattern = r'^hx[a-fA-F0-9]{40}$'
     return re.match(regex_pattern, input_string) is not None
 
