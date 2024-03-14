@@ -49,3 +49,13 @@ Follow these steps to set up the project:
     ```
 
 ## Usage
+
+For Windows:
+```bash
+python gh.py --address=[your address]
+```
+
+For Mac:
+```bash
+python3 gh.py --address=[your address]
+```
