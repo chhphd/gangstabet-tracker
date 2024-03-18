@@ -3,7 +3,7 @@ from datetime import datetime
 import argparse
 import re
 
-def validate_string(input_string: str) -> bool:
+def validate_address(input_string: str) -> bool:
     """
     Validates the ICX address. Rules:
     - string starts with 'hx'
@@ -94,14 +94,12 @@ def menu():
 
 # Main menu options
 def option1():
-    # TODO: progress bar
     amounts = output_total_holdings(input_address)
     text = output_rankings(amounts, input_address)
     print(text)
     export_to_txt(text, f"output/rankings_{formatted_now}.txt")
 
 def option2():
-    # TODO: progress bar
     data = output_total_holdings(input_address)
     print(data)
     export_to_csv(data, f"output/total_holdings_{formatted_now}.csv")
@@ -143,7 +141,7 @@ formatted_now = now.strftime("%Y%m%d_%H%M%S")
 
 if __name__ == "__main__":
     input_address = parser()
-    if validate_string(input_address):
+    if validate_address(input_address):
         main()
     else:
         print("Please provide a valid ICX address")
